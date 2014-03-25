@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><web-app xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.5" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee                http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+
+  <!-- Default page to serve -->
+  <welcome-file-list>
+    <welcome-file>jsps/MovieNotesLoginPage.jsp</welcome-file>
+  </welcome-file-list>
+
+  <!-- Servlets -->
+  
+  <servlet>
+    <servlet-name>GetDevices</servlet-name>
+    <servlet-class>com.movienotes.GetDevices</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>GetDevices</servlet-name>
+    <url-pattern>/getDevices</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>MovieOperations</servlet-name>
+    <servlet-class>com.movienotes.MovieOperations</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>MovieOperations</servlet-name>
+    <url-pattern>/movieOperations</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>SystemServiceServlet</servlet-name>
+    <servlet-class>com.google.api.server.spi.SystemServiceServlet</servlet-class>
+    <init-param>
+      <param-name>services</param-name>
+      <param-value/>
+    </init-param>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>SystemServiceServlet</servlet-name>
+    <url-pattern>/_ah/spi/*</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>userOperations</servlet-name>
+    <servlet-class>com.movienotes.UserOperations</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>userOperations</servlet-name>
+    <url-pattern>/userOperations</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>validateUser</servlet-name>
+    <servlet-class>com.movienotes.LoginAction</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>validateUser</servlet-name>
+    <url-pattern>/validateUser</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>logoutUser</servlet-name>
+    <servlet-class>com.movienotes.LogoutAction</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>logoutUser</servlet-name>
+    <url-pattern>/logoutUser</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>MovieNotesHome</servlet-name>
+    <jsp-file>jsps/MovieNotesLoginPage.jsp</jsp-file>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>MovieNotesHome</servlet-name>
+    <url-pattern>/MovieNotes</url-pattern>
+  </servlet-mapping>
+  
+  <listener>
+    <listener-class>
+     com.movienotes.MovieNotesAppConfigs
+    </listener-class>
+  </listener>
+  
+</web-app>
