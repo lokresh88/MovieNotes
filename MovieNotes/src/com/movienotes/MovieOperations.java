@@ -5,7 +5,11 @@ import java.io.PrintWriter;
 import java.net.URLDecoder;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.logging.Logger;
@@ -19,6 +23,8 @@ import org.mortbay.util.ajax.JSON;
 
 import com.google.appengine.labs.repackaged.org.json.JSONException;
 import com.google.appengine.labs.repackaged.org.json.JSONObject;
+import com.google.gson.Gson;
+import com.mongodb.DBConnector;
 
 public class MovieOperations extends HttpServlet {
 	private static final Logger log = Logger.getLogger(GetDevices.class
@@ -29,213 +35,325 @@ public class MovieOperations extends HttpServlet {
 		HttpSession serv = req.getSession();
 		JSONObject jsobj = new JSONObject();
 		PrintWriter pout = resp.getWriter();
-
-		String username = (String) serv.getAttribute("loggedinUserName");
 		Long userid = (Long) serv.getAttribute("loggedinUserId");
-
 		DBUtil dbutil = new DBUtil();
+		String params = req.getParameter("params") != null ? req
+				.getParameter("params") : null;
+		Gson gson = new Gson();
+		if (params != null) {
+			Movie mov = gson.fromJson(params, Movie.class);
+
+			if (mov.getAction().equalsIgnoreCase("addMovie")) {
+
+				Long movieid = dbutil.getMovieId(mov.getName());
+				System.out.print(movieid + " -->" + mov.getName());
+				movieid = (movieid == null) ? dbutil.getMovieImdbId(mov
+						.getImdbid()) : movieid;
+				mov.setUserId(userid);
+
+				System.out.print(movieid + " -->");
+				// validate movie name & imdb id
+				if (movieid == null)
+					movieid = dbutil.createMovie(mov);
+
+				mov.setId(movieid);
+
+				dbutil.createMovieUserAct(mov, mov.getAddTo(), null);
+				try {
+					jsobj.put("status", true);
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+				pout.write(jsobj.toString());
+				return;
+			}
+		}
 
 		String action = req.getParameter("action") != null ? req
 				.getParameter("action") : null;
-		System.out.print("test");
 
-		if (action != null
-				&& (action.equalsIgnoreCase("addMovieNote") || action
-						.equalsIgnoreCase("editDevice"))) {
+		if (action != null && action.equalsIgnoreCase("markFav")) {
+			Long movid = req.getParameter("movid") != null ? Long.parseLong(req
+					.getParameter("movid")) : null;
+			Boolean set = req.getParameter("set") != null ? Boolean
+					.parseBoolean(req.getParameter("set")) : null;
+			if (movid != null) {
+				try {
 
-			String devicename = URLDecoder.decode(req
-					.getParameter("devicename"));
-			Long newedittaskid = null;
-			boolean editmode = false;
+					Movie mov = dbutil.getItemByItemId(movid);
+					mov.setUserId(userid);
+					dbutil.deleteItemUserMap(mov, DBUtilConstants.LIST_FAV);
 
-			if (action.equalsIgnoreCase("editDevice")) {
-				editmode = true;
-				newedittaskid = req.getParameter("id") != null ? Long
-						.parseLong(req.getParameter("id")) : null;
-				if (newedittaskid != null) {
-					// ins = dbutil.getItemByItemId(newedittaskid);
-					// taskchecked = ins.isChecked();
+					if (set)
+						dbutil.createMovieUserAct(mov,
+								DBUtilConstants.LIST_FAV, null);
+					jsobj.put("status", true);
+				} catch (JSONException e) {
+					e.printStackTrace();
 				}
+				pout.write(jsobj.toString());
+				return;
 			}
 
-			Movie deviceObj = new Movie();
-			deviceObj.setName(devicename);
-			deviceObj.setUserId(userid);
+			// error
+			try {
+				jsobj.put("status", false);
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+			pout.write(jsobj.toString());
+			return;
+		} else if (action != null && action.equalsIgnoreCase("setOptions")) {
+			Long movid = req.getParameter("movid") != null ? Long.parseLong(req
+					.getParameter("movid")) : null;
+			Integer set = req.getParameter("set") != null ? Integer
+					.parseInt(req.getParameter("set")) : null;
+			if (movid != null) {
+				try {
+					Movie mov = dbutil.getItemByItemId(movid);
+					mov.setUserId(userid);
+					dbutil.deleteItemUserMap(mov, null);
 
-//			if (action.equalsIgnoreCase("editDevice")) {
-//				/*
-//				 * if(newedittaskid!=null){ ins =
-//				 * dbutil.getItemByItemId(newedittaskid);
-//				 * taskObj.setId(newedittaskid);
-//				 * taskObj.setChecked(ins.isChecked()); if(ins.getUserId()!=null
-//				 * && ins.getUserId().equals(userid)){
-//				 * dbutil.updateItem(taskObj); } try { jsobj.put("status",
-//				 * true); jsobj.put("taskId", newedittaskid); } catch
-//				 * (JSONException e) { e.printStackTrace(); } } PrintWriter pout
-//				 * = resp.getWriter(); pout.write(jsobj.toString());
-//				 */
-//			} else {
-//
-//				String nickname = URLDecoder.decode(req
-//						.getParameter("nick_name"));
-//				deviceObj.setNickname(nickname);
-//				Long prior = req.getParameter("priority") != null ? Long
-//						.parseLong(req.getParameter("priority")) : 0;
-//				deviceObj.setPriority(prior);
-//				String micAddr = URLDecoder.decode(req
-//						.getParameter("micro_address"));
-//				deviceObj.setMicAddr(micAddr);
-//				Boolean status = req.getParameter("status") != null ? Boolean
-//						.parseBoolean(req.getParameter("status")) : false;
-//				deviceObj.setStatus(status);
-//
-//				Boolean active = req.getParameter("active") != null ? Boolean
-//						.parseBoolean(req.getParameter("active")) : false;
-//				deviceObj.setActive(active);
-//
-//				Long newdeviceid = dbutil.createMovie(deviceObj);
-//				deviceObj.setId(newdeviceid);
-//				System.out.print("CREADED" + userid);
-//
-//				dbutil.createStatEntry(deviceObj);
-//				try {
-//					jsobj.put("status", true);
-//					jsobj.put("deviceId", newdeviceid);
-//				} catch (JSONException e) {
-//					e.printStackTrace();
-//				}
-//				pout.write(jsobj.toString());
-//			}
-//		} else if (action != null && action.equalsIgnoreCase("updateDevice")) {
-//			// called by the micro controller alone ..
-//
-//			Movie deviceObj = new Movie();
-//			String micAddr = URLDecoder.decode(req
-//					.getParameter("micro_address"));
-//			deviceObj.setMicAddr(micAddr);
-//			Boolean status = req.getParameter("status") != null ? Boolean
-//					.parseBoolean(req.getParameter("status")) : false;
-//			deviceObj.setStatus(status);
-//			String devicename = URLDecoder.decode(req
-//					.getParameter("devicename"));
-//			deviceObj.setName(devicename);
-//
-//			Long id = dbutil.getDeviceByMICANDNAME(micAddr, devicename);
-//
-//			if (id == null) {
-//				deviceObj.setNickname(devicename);
-//				deviceObj.setActive(false);
-//				deviceObj.setStatus(status);
-//				Long newdeviceid = dbutil.createMovie(deviceObj);
-//				System.out.print("CREADED" + userid);
-//				deviceObj.setId(newdeviceid);
-//				dbutil.createStatEntry(deviceObj);
-//				try {
-//					jsobj.put("status", true);
-//					jsobj.put("deviceId", newdeviceid);
-//				} catch (JSONException e) {
-//					e.printStackTrace();
-//				}
-//				pout.write(jsobj.toString());
-//			} else {
-//				Movie udated = dbutil.getItemByItemId(id);
-//				udated.setStatus(status);
-//				dbutil.updateItem(udated);
-//				dbutil.createStatEntry(udated);
-//				try {
-//					jsobj.put("status", true);
-//					jsobj.put("deviceId", id);
-//				} catch (JSONException e) {
-//					e.printStackTrace();
-//				}
-//				pout.write(jsobj.toString());
-//			}
-//
-//		} else if (action != null
-//				&& action.equalsIgnoreCase("deviceMonitorState")) {
-//
-//			Long id = req.getParameter("id") != null ? Long.parseLong(req
-//					.getParameter("id")) : null;
-//			Boolean state = req.getParameter("state") != null ? Boolean
-//					.parseBoolean(req.getParameter("state")) : null;
-//
-//			if (id != null) {
-//				if (!state) {
-//					Movie dev = new Movie();
-//					dev.setUserId(userid);
-//					dev.setId(id);
-//					dbutil.deleteItemUserMap(dev);
-//				} else {
-//					String xstate = req.getParameter("xstate") != null ? (req
-//							.getParameter("xstate")) : null;
-//					String ystate = req.getParameter("ystate") != null ? (req
-//							.getParameter("ystate")) : null;
-//
-//					Movie dev = new Movie();
-//					dev.setUserId(userid);
-//					dev.setId(id);
-//					dev.setXpos(xstate);
-//					dev.setYpos(ystate);
-//					dbutil.createMovieUserAct(dev);
-//				}
-//				try {
-//					jsobj.put("status", true);
-//				} catch (JSONException e) {
-//					e.printStackTrace();
-//				}
-//				pout.write(jsobj.toString());
-//			}
-//
-//		} else if (action != null && action.equalsIgnoreCase("devicePositions")) {
-//			Long id = req.getParameter("id") != null ? Long.parseLong(req
-//					.getParameter("id")) : null;
-//			String xstate = req.getParameter("xstate") != null ? (req
-//					.getParameter("xstate")) : null;
-//			String ystate = req.getParameter("ystate") != null ? (req
-//					.getParameter("ystate")) : null;
-//
-//			if (id != null) {
-//				Movie dev = new Movie();
-//				dev.setUserId(userid);
-//				dev.setId(id);
-//				dev.setXpos(xstate);
-//				dev.setYpos(ystate);
-//				dbutil.deleteItemUserMap(dev);
-//				dbutil.createMovieUserAct(dev);
-//				try {
-//					jsobj.put("status", true);
-//				} catch (JSONException e) {
-//					e.printStackTrace();
-//				}
-//				pout.write(jsobj.toString());
-//			}
-//		} else if (action != null && action.equalsIgnoreCase("deviceState")) {
-//
-//			Long id = req.getParameter("id") != null ? Long.parseLong(req
-//					.getParameter("id")) : null;
-//			Boolean state = req.getParameter("state") != null ? Boolean
-//					.parseBoolean(req.getParameter("state")) : null;
-//			if (id != null) {
-//				Movie dev = dbutil.getItemByItemId(id);
-//				if (dev != null && dev.getName() != null) {
-//
-//					
-//
-//					// call the Api
-//					com.movienotes.User user = dbutil.getUserById(userid);
-//				//	String micAddress = user.getMicAddress();// (String)
-//					try {
-//						jsobj.put("status", true);
-//					} catch (JSONException e) {
-//						e.printStackTrace();
-//					}
-//					
-//				
-//				}
-//				pout.write(jsobj.toString());
-//			}
+					switch (set) {
+					case 1:
+						dbutil.createMovieUserAct(mov,
+								DBUtilConstants.LIST_TOWATCH, null);
+						break;
+					case 2:
+						dbutil.createMovieUserAct(mov,
+								DBUtilConstants.LIST_WATCHED, null);
+						break;
+					case 3:
+						dbutil.createMovieUserAct(mov,
+								DBUtilConstants.LIST_MAYBE, null);
+						break;
+					}
+					jsobj.put("status", true);
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+				pout.write(jsobj.toString());
+				return;
+			}
+
+			// error
+			try {
+				jsobj.put("status", false);
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+			pout.write(jsobj.toString());
+			return;
+		} else if (action != null && action.equalsIgnoreCase("Listing")) {
+
+			Long fbid = req.getParameter("fbid") != null ? Long.parseLong(req
+					.getParameter("fbid")) : null;
+			Boolean me = true;
+			if (fbid != null && !userid.equals(fbid)) {
+				me = false;
+				userid = fbid;
+			}
+
+			System.out.print(userid + " " + me);
+
+			Integer set = req.getParameter("set") != null ? Integer
+					.parseInt(req.getParameter("set")) : null;
+			if (set != null) {
+				HashMap movieslist = new HashMap();
+
+				switch (set) {
+				case 1:
+					movieslist = dbutil.getMoviesListing(userid,
+							DBUtilConstants.LIST_TOWATCH);
+					break;
+				case 2:
+					movieslist = dbutil.getMoviesListing(userid,
+							DBUtilConstants.LIST_MAYBE);
+					break;
+				case 3:
+					movieslist = dbutil.getMoviesListing(userid,
+							DBUtilConstants.LIST_WATCHED);
+					break;
+				case 4:
+					movieslist = dbutil.getMoviesListing(userid,
+							DBUtilConstants.LIST_FAV);
+					break;
+				case 5:
+					movieslist = dbutil.getReccomendations(userid);
+					break;
+				}
+
+				HashMap moviesListFav = dbutil.getMoviesListing(userid,
+						DBUtilConstants.LIST_FAV);
+				ArrayList favsMap = (ArrayList) moviesListFav.get("movies");
+				req.setAttribute("favs", dbutil.convertMoviesIntoIds(favsMap));
+				req.setAttribute("moviesList", movieslist);
+				req.setAttribute("me", me);
+				req.setAttribute("fbid", userid);
+
+				RequestDispatcher rd = req
+						.getRequestDispatcher("/jsps/movieslist.jsp");
+				resp.setHeader("Cache-Control", "no-cahce");
+				resp.setHeader("Expires", "0");
+				rd.forward(req, resp);
+				return;
+
+			}
+
+			// error
+			try {
+				jsobj.put("status", false);
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+			pout.write(jsobj.toString());
+			return;
+		} else if (action != null && action.equalsIgnoreCase("movieInfo")) {
+
+			Long fbid = req.getParameter("fbid") != null ? Long.parseLong(req
+					.getParameter("fbid")) : null;
+			Movie movratings = new Movie();
+			movratings.setUserId(userid);
+			
+			Boolean me = true;
+			if (fbid != null && !userid.equals(fbid)) {
+				me = false;
+				userid = fbid;
+			}
+			Long movid = req.getParameter("movid") != null ? Long.parseLong(req
+					.getParameter("movid")) : null;
+
+			if (movid != null) {
+
+				Movie mov = dbutil.getItemByItemId(movid);
+				req.setAttribute("mov", mov);
+				req.setAttribute("me", me);
+				req.setAttribute("fbid", userid);
+
+				// get movie types
+
+				List movieTypes = dbutil.getMovieInfoForUser(userid, movid);
+				req.setAttribute("favMap",
+						movieTypes.contains(DBUtilConstants.LIST_FAV));
+				req.setAttribute("type", movieTypes);
+
+				
+				String comments = "";
+				Double rating =0.0;
+				
+				HashMap<Long,MovieRatings> movieRatings = dbutil.getMovieRatings(movratings.getUserId(), movid);
+				if(movieRatings.containsKey(userid)){
+					MovieRatings movr = movieRatings.get(userid);
+					comments = movr.getComments();
+					rating = movr.getRating();
+					movieRatings.remove(userid);
+				}
+				
+				Iterator rItr = movieRatings.keySet().iterator();
+				Double avgRating = rating;
+				while (rItr.hasNext()) {
+					Long fbidV = (Long)rItr.next();
+					MovieRatings movrating = movieRatings.get(fbidV);
+					Double val = movrating.getRating();
+					avgRating+=val;
+				}
+				
+				int size = movieRatings.size()+1;
+				if(avgRating>0)
+					avgRating/=size;
+				
+				DecimalFormat df = new DecimalFormat("#.#");
+				String avgRatingStr = df.format(avgRating);
+				
+				req.setAttribute("comments", comments);
+				req.setAttribute("rating", rating);
+				req.setAttribute("avgRating", avgRatingStr);
+				req.setAttribute("movieRatings", movieRatings);			
+				
+				
+				RequestDispatcher rd = req
+						.getRequestDispatcher("/jsps/movieinfo.jsp");
+				resp.setHeader("Cache-Control", "no-cahce");
+				resp.setHeader("Expires", "0");
+				rd.forward(req, resp);
+				return;
+			}
+
+		} else if (action != null && action.equalsIgnoreCase("movieRating")) {
+
+			Long movid = req.getParameter("movid") != null ? Long.parseLong(req
+					.getParameter("movid")) : null;
+			String cmts = req.getParameter("cmts") != null ? req
+					.getParameter("cmts") : null;
+			Double val = req.getParameter("val") != null ? Double
+					.parseDouble(req.getParameter("val")) : 0;
+
+			if (movid != null) {
+
+				Movie mov = dbutil.getItemByItemId(movid);
+				mov.setUserId(userid);
+
+				// get movie types
+
+				dbutil.deleteUserMovRating(mov);
+				dbutil.createMovieRating(mov, cmts, val);
+			}
+
+			// error
+			try {
+				jsobj.put("status", false);
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+			pout.write(jsobj.toString());
+			return;
+
+		}else if (action != null && action.equalsIgnoreCase("getMovieRatings")) {
+
+			Long movid = req.getParameter("movid") != null ? Long.parseLong(req
+					.getParameter("movid")) : null;
+		
+			if (movid != null) {
+
+				Movie mov = dbutil.getItemByItemId(movid);
+				mov.setUserId(userid);
+
+				// get movie types
+
+				String comments = "";
+				Double rating =0.0;
+				HashMap<Long,MovieRatings> movieRatings = dbutil.getMovieRatings(userid, movid);
+				if(movieRatings.containsKey(userid)){
+					MovieRatings movr = movieRatings.get(userid);
+					comments = movr.getComments();
+					rating = movr.getRating();
+					movieRatings.remove(userid);
+				}
+				req.setAttribute("comments", comments);
+				req.setAttribute("rating", rating);
+				req.setAttribute("movieRatings", movieRatings);
+				
+				System.out.print(movieRatings.toString());
+				
+				RequestDispatcher rd = req
+						.getRequestDispatcher("/jsps/movierating.jsp");
+				resp.setHeader("Cache-Control", "no-cahce");
+				resp.setHeader("Expires", "0");
+				rd.forward(req, resp);
+				return;
+			}
+
+			// error
+			try {
+				jsobj.put("status", false);
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+			pout.write(jsobj.toString());
+			return;
 
 		}
 
 	}
+
 }

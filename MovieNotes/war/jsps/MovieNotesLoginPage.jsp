@@ -15,18 +15,20 @@
 <script language="JavaScript" type="text/javascript"
 	src="../jquery_min.js"></script>	
 
-	<script src="../jquery_migrate.js"></script>
-	<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">	
-     <script src="//code.jquery.com/ui/1.10.4/jquery-ui.js"></script>  
+	<script src="../jquery_migrate.js"></script>     
+     
+	<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
+	<link rel="stylesheet" href="../css/jquery-ui-1.10.4.custom.min.css">		
     <link type="text/css" rel="stylesheet" href="../MNStyles.css" />    
+    <link type="text/css" rel="stylesheet" href="../css/jquery.rating.css" />  
 <script src="../js/jquery.easing.1.3.js" type="text/javascript"></script>
 <script src="../js/jquery.evoslider.lite-1.1.0.min.js" type="text/javascript"></script>
 <script type="text/javascript" src="../MNScripts.js"></script>	
 <script language="JavaScript" type="text/javascript"
 	src="../jquery_ui.js"></script>
 <script language="JavaScript" type="text/javascript"
-	src="../js/bootstrap-switch.min.js"></script>
-	
+	src="../js/bootstrap-switch.min.js"></script>	
+	<script type="text/javascript" src="../js/jquery.rating.pack.js"></script>
 	
 
 </head>

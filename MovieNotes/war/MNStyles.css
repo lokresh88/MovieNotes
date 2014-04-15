@@ -42,7 +42,7 @@ body {
 .loginPanel {
 	background-color: #d7efa5;
 	height: 80px;
-	width: 160px;
+	width: 200px;
 	padding:20px;
 	position: absolute;
 	top: 65%;
@@ -360,10 +360,10 @@ ul.custom-list li, ol.custom-list li {
 #droppable { width: 150px; height: 150px; padding: 0.5em; float: left; margin: 10px; }
 
 .devicesPanel div{
-background-color: #FFFFFF;
+
 }
 .home{
-border-color: #E5E5E5 #DBDBDB #D2D2D2;border-image: none;border-radius: 5px;border-style: none;border-width: 1px;box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);width: 65%; height: 380px; border-radius: 3px; padding: 10px; margin-top: 15px;display: inline-block;
+border-color: #E5E5E5 #DBDBDB #D2D2D2;border-image: none;border-radius: 5px;border-style: none;border-width: 1px;box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);width: 70%; min-height: 380px; height:auto; border-radius: 3px; padding: 10px; margin-top: 15px;display: inline-block;
 }
 
 .inactive{
@@ -380,10 +380,10 @@ border-radius:4px;
     border-radius: 5px;
     box-shadow: 0 15px 10px -10px rgba(0, 0, 0, 0.1), 0 1px 4px rgba(0, 0, 0, 0.1), 0 0 40px rgba(0, 0, 0, 0.1) inset;
     font-size: 13px;
-    height: 10px;
-    margin-top: 20px;
+    height: 3px;
+    margin-top: 15px;
     margin-bottom: 10px;    
-    width: 65%;
+    width: 70%;
 }
 .navbar li {
     float: left;
@@ -423,7 +423,6 @@ ul, li {
 }
 
 .container {
-    background: none repeat scroll 0 0 #F3F0EB;
     border: 0 solid #DDDDDD;
     margin: 0 auto;
     max-width: 1240px;
@@ -432,14 +431,15 @@ ul, li {
 
 .logo {
     float: left;
-    height: 27px;
-    
-    width: 350px;
+    height: 27px;    
+    width: 20%;
 }
 
 .headTop {
 padding-top:10px;
     z-index: 101;
+    height: 18%;
+    color: #2E6E9E;
 }
 
 .header .tr {
@@ -551,6 +551,11 @@ ul, li {
     border: none;   
 }
 
+#format >    .ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default {
+    background: none repeat scroll 0 0 #FFFFFF;
+    border: none;   
+}
+
 .ui-sortable .ui-state-default{
 	height: 60px;
 }
@@ -561,4 +566,122 @@ ul, li {
     width: 140px;
 }
     
-    
+.pics{
+	width: 210px;
+}
+
+.picsspan{
+	padding-left: 0px;
+}
+
+
+.addMovie{
+	width: 600px;
+	height: 450px;
+		-moz-border-radius: 10px;
+	-webkit-border-radius: 10px;
+	border-radius: 10px;
+	border-style: solid;
+	border-width: 12px;
+	border-color: 2E6E81;
+	position: absolute;
+	top: 12%;
+	left: 40%;
+	padding:5px;
+	background-color: #ffffff;
+}
+
+.addMovie input{
+	border: 0px;
+	border-bottom: 2px solid #888888;
+	height: auto;
+	font-size: 15px;
+	width: 320px;
+	
+}
+
+.addMovie label{
+	font-size: 16px;
+	padding-right: 5px;
+}
+
+.bld{
+	font-weight: bold;
+}
+
+.slt{
+	border: 1px solid green;
+}
+
+.movies > div{
+	float: left;
+	padding-left: 10px;
+	width: 25%;
+	height: 100px;
+}
+
+.grey{
+	color: #888888;	
+}
+
+.sell{
+	border:1px solid #2E6E81;
+	height: auto;
+}
+
+.inact{
+	border:1px solid #888888;
+	height: auto;
+}
+
+.inact >span{
+	cursor: pointer;
+	padding: 2px;
+	margin: 0px;
+}
+
+.inact:hover{
+	cursor: pointer;
+}
+
+.inact1:hover{
+	cursor: pointer;
+}
+
+.movieInfo{
+	width: 70%;
+	height: 500px;
+	overflow:scroll;
+		-moz-border-radius: 10px;
+	-webkit-border-radius: 10px;
+	border-radius: 10px;
+	border-style: solid;
+	border-width: 12px;
+	border-color: 2E6E81;
+	position: absolute;
+	top: 5%;
+	left: 10%;
+	padding:15px;
+	background-color: #ffffff;
+	
+}
+
+.moviesDiv > div{
+	float: left;
+	padding-left: 10px;
+	width: 25%;
+	height: 100px;
+	color: #2E6E9E;
+    font-weight: bold;
+	
+}
+
+.moviesDiv label{
+	font-size: 16px;
+	padding-right: 5px;
+}
+
+.blk{
+	color: #333333;
+}
+

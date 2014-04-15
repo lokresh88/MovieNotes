@@ -63,12 +63,21 @@
   </servlet-mapping>
   
   <servlet>
+    <servlet-name>MovieNotesLogin</servlet-name>
+    <jsp-file>/jsps/MovieNotesLoginPage.jsp</jsp-file>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>MovieNotesLogin</servlet-name>
+    <url-pattern>/MovieNotes</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
     <servlet-name>MovieNotesHome</servlet-name>
-    <jsp-file>jsps/MovieNotesLoginPage.jsp</jsp-file>
+    <servlet-class>com.movienotes.UserProfiles</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>MovieNotesHome</servlet-name>
-    <url-pattern>/MovieNotes</url-pattern>
+    <url-pattern>/MovieNotes/profiles/*</url-pattern>
   </servlet-mapping>
   
   <listener>

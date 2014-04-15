@@ -15,10 +15,10 @@ public class MovieRatings implements Serializable {
 		Comments = comments;
 	}
 
-	public int getRating() {
+	public double getRating() {
 		return rating;
 	}
-	public void setRating(int rating) {
+	public void setRating(double rating) {
 		this.rating = rating;
 	}
 
@@ -29,16 +29,16 @@ public class MovieRatings implements Serializable {
 		this.movie = movie;
 	}
 
-	public User getUser() {
-		return user;
+	public Long getUser() {
+		return userId;
 	}
-	public void setUser(User user) {
-		this.user = user;
+	public void setUser(Long user) {
+		this.userId = user;
 	}
 
-	private User user;
+	private Long userId;
 	private String Comments;
-	private int rating;
+	private double rating;
 	
 	
 	

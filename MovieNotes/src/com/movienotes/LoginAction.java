@@ -37,45 +37,58 @@ public class LoginAction extends HttpServlet {
 		PrintWriter pout = resp.getWriter();
 		JSONObject jsobj = new JSONObject();
 
-		
-		if (serv.getAttribute("loggedinUserId") != null) {
-			System.out.print("testing");
-			RequestDispatcher rd = req
-					.getRequestDispatcher("jsps/MovieNotesHomePage.jsp");
-			resp.setHeader("Cache-Control", "no-cahce");
-			resp.setHeader("Expires", "0");
-			rd.forward(req, resp);
-			
+		Long userid = serv.getAttribute("loggedinUserId") != null ? (Long) serv
+				.getAttribute("loggedinUserId") : null;
+		Long orgUserId = null;
+		String id = req.getParameter("fbid");
+		String name = URLDecoder.decode(req.getParameter("fbname"));
+		ArrayList<Long> friends = new ArrayList<Long>();
+		DBUtil dbutil = new DBUtil();
+
+		// session
+		if (userid != null) {
+			orgUserId = dbutil.getUserOrgId(userid);
+		} // new user or first time
+		else if (id != null) {
+			orgUserId = dbutil.validateUserLogin(new Long(id), name);
+			userid = new Long(id);
+		}
+
+		if (orgUserId == null) { // error
+			try {
+				jsobj.put("status", false);
+				pout.print(jsobj.toString());
+				return;
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+		} else {
+			try {
+				com.movienotes.User userObj = dbutil.getUserById(orgUserId);
+				serv.setAttribute("loggedinUserName", userObj.getName());
+				serv.setAttribute("loggedinUserId", userObj.getFacebookUserID());
+				jsobj.put("status", true);
+				pout.print(jsobj.toString());
+
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
 			return;
 		}
-		
 
-		String id = req.getParameter("fbid");
-		String name =  URLDecoder.decode(req.getParameter("fbname"));
-		System.out.print("testing"+id);
+		/*
+		 * friends = dbutil.getUserFriends(userObj.getFacebookUserID());
+		 * req.setAttribute("user", userObj); req.setAttribute("me", true);
+		 * req.setAttribute("friends", friends); System.out.print("f" +
+		 * friends); serv.setAttribute("loggedinUserName", userObj.getName());
+		 * serv.setAttribute("loggedinUserId", userObj.getFacebookUserID());
+		 * RequestDispatcher rd = req
+		 * .getRequestDispatcher("jsps/MovieNotesHomePage.jsp");
+		 * resp.setHeader("Cache-Control", "no-cahce");
+		 * resp.setHeader("Expires", "0");
+		 * 
+		 * rd.forward(req, resp); return;
+		 */
 
-		if (id != null) {
-			DBUtil dbutil = new DBUtil();
-			Long statid = dbutil.validateUserLogin(new Long(id),name);
-
-			if (statid != null) {
-				serv.setAttribute("loggedinUserName", name);
-				serv.setAttribute("loggedinUserId", id);
-//				try {
-//					jsobj.put("status", true);
-//				} catch (JSONException e) {
-//					e.printStackTrace();
-//				}
-				System.out.print("testing1");
-				RequestDispatcher rd = req
-						.getRequestDispatcher("jsps/MovieNotesHomePage.jsp");
-				resp.setHeader("Cache-Control", "no-cahce");
-				resp.setHeader("Expires", "0");
-				rd.forward(req, resp);
-				return;
-			} 
-			//pout.print(jsobj.toString());
-
-		}
 	}
 }

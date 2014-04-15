@@ -1,4 +1,26 @@
-<!-- Indices written at Mon, 24 Mar 2014 23:50:24 EDT -->
+<!-- Indices written at Tue, 15 Apr 2014 01:04:26 EDT -->
 
-<datastore-indexes/>
+<datastore-indexes>
 
+    <!-- Used 14 times in query history -->
+    <datastore-index kind="MovieNotes" ancestor="false" source="auto">
+        <property name="LIST_TYPE" direction="asc"/>
+        <property name="USERID" direction="asc"/>
+        <property name="movieID" direction="asc"/>
+        <property name="LIST_TYPE" direction="asc"/>
+    </datastore-index>
+
+    <!-- Used 32 times in query history -->
+    <datastore-index kind="MovieNotes" ancestor="false" source="auto">
+        <property name="USERID" direction="asc"/>
+        <property name="movieID" direction="asc"/>
+        <property name="LIST_TYPE" direction="asc"/>
+    </datastore-index>
+
+    <!-- Used 78 times in query history -->
+    <datastore-index kind="MovieNotes" ancestor="false" source="auto">
+        <property name="USERID" direction="asc"/>
+        <property name="USERID" direction="asc"/>
+    </datastore-index>
+
+</datastore-indexes>
